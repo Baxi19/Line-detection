@@ -3,7 +3,7 @@ import numpy as np
 
 def make_coordinates(image, line_parameters):
     slope, intercepts = line_parameters
-    print(image.shape)
+    #print(image.shape)
     # Y = mx + b
     y1 = image.shape[0]
     y2 = int(y1*(3/5))
@@ -64,16 +64,45 @@ def region_of_interes(image):
 # combo_image = cv2.addWeighted(lane_image, 0.8,line_image,1,1)
 # cv2.imshow("result", combo_image)
 # cv2.waitKey(0)
+
+def resize(video):
+    cap = cv2.VideoCapture(video)
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    out = cv2.VideoWriter('modificado.mp4', fourcc, 5, (1280, 720))
+    while True:
+        ret, frame = cap.read()
+        if ret == True:
+            b = cv2.resize(frame, (1280, 720), fx=0, fy=0, interpolation=cv2.INTER_CUBIC)
+            out.write(b)
+        else:
+            break
+
+    cap.release()
+    out.release()
+    cv2.destroyAllWindows()
+    print("Video resized")
+    return out
+
+# resize('test1.mp4')
+
+
 if __name__ == '__main__':
     cap = cv2.VideoCapture("test2.mp4")
     while(cap.isOpened()):
         _, frame = cap.read()
         canny_image = canny(frame)
         cropped_image = region_of_interes(canny_image)
-        lines = cv2.HoughLinesP(cropped_image, 2, np.pi / 180, 100, np.array([]), maxLineGap=5)
-        averaged_lines = average_slope_itntercept(frame, lines)
-        line_image = display_lines(frame, averaged_lines)
-        combo_image = cv2.addWeighted(frame, 0.8, line_image, 1, 1)
-        cv2.imshow("result", combo_image)
-        cv2.waitKey(1)
+        lines = cv2.HoughLinesP(cropped_image, 2, np.pi / 180, 100, np.array([]), maxLineGap=5, minLineLength=40)
+        try:
+            averaged_lines = average_slope_itntercept(frame, lines)
+            line_image = display_lines(frame, averaged_lines)
+            combo_image = cv2.addWeighted(frame, 0.8, line_image, 1, 1)
+            cv2.imshow("result", combo_image)
+        except:
+            print("->")
+        if cv2.waitKey(1) == ord('q'):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
     print("Finish..")
