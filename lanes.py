@@ -1,6 +1,11 @@
 import cv2
 import numpy as np
 
+
+# Line detection
+# Works only in marked way
+# Randald Villegas Brenes
+
 def make_coordinates(image, line_parameters):
     slope, intercepts = line_parameters
     #print(image.shape)
@@ -82,9 +87,6 @@ def resize(video):
     cv2.destroyAllWindows()
     print("Video resized")
     return out
-
-# resize('test1.mp4')
-
 
 if __name__ == '__main__':
     cap = cv2.VideoCapture("test2.mp4")
